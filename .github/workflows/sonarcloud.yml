@@ -19,19 +19,28 @@ on:
   push:
     branches:
       - master
+  pull_request:
+      types: [opened, synchronize, reopened]
 
 jobs:
-  sonarCloudTrigger:
-    if: github.repository == 'apache/daffodil'
+  sonar:
     name: SonarCloud Scan, Scala ${{ matrix.scala_version }}, ${{ matrix.os }}
     strategy:
       matrix:
         distribution: [ adopt ]
-        java_version: [ 8 ]
+        java_version: [ 11 ]
         scala_version: [ 2.12.14 ]
         os: [ ubuntu-20.04 ]
+        env_cc: [ clang-10 ]
+        env_ar: [ llvm-ar-10 ]
 
+    if: github.repository == 'apache/daffodil'
     runs-on: ${{ matrix.os }}
+    env:
+      AR: ${{ matrix.env_ar }}
+      CC: ${{ matrix.env_cc }}
+      SBT: sbt -J-Xms1024m -J-Xmx5120m -J-XX:ReservedCodeCacheSize=512m -J-XX:MaxMetaspaceSize=1024m ++${{ matrix.scala_version }}
+
     steps:
 
       ############################################################
@@ -60,8 +69,6 @@ jobs:
 
       - name: Compile
         run: $SBT compile Test/compile IntegrationTest/compile
-        env:
-          SBT: sbt -J-Xms1024m -J-Xmx5120m -J-XX:ReservedCodeCacheSize=512m -J-XX:MaxMetaspaceSize=1024m ++${{ matrix.scala_version }}
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v1.6
