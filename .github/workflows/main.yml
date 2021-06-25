@@ -15,12 +15,16 @@
 
 name: Daffodil CI
 
+# Run CI when pushing a commit to master or creating a pull request or
+# adding another commit to a pull request or reopening a pull request.
+
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-      types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
+
+# Build Daffodil and run some checks.
 
 jobs:
   check:
@@ -131,7 +135,7 @@ jobs:
         run: $SBT coverage IntegrationTest/test
 
       - name: Generate Coverage Report
-        run: $SBT coverage coverageAggregate
+        run: $SBT coverageAggregate
 
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v1.5.2
