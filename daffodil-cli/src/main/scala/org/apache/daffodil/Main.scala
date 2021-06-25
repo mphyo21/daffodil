@@ -1578,6 +1578,7 @@ object Main extends Logging {
     1
   }
 
+  // FIXME: temporary FIXME comment added to test sonar scan
   def main(arguments: Array[String]): Unit = {
     val ret = try {
       run(arguments)
